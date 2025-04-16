@@ -970,10 +970,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25a028b332d88874b8e67ed9320283fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blackBlockPrefab: {fileID: 7651269122295910239, guid: eafa5e766a658644d93a73b6df2618c8, type: 3}
-  whiteBlockPrefab: {fileID: 4131268407703559647, guid: 06ebf8e477229b44298256ad81fde3a0, type: 3}
+  blockPrefab: {fileID: 4131268407703559647, guid: 06ebf8e477229b44298256ad81fde3a0, type: 3}
   rows: 6
-  columns: 16
+  columns: 8
   spacing: 1
   initializePosx: -7.5
   initializePosy: 2.5
