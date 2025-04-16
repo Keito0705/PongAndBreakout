@@ -268,7 +268,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b69e2c4457b4c840a06173f6d387636, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isCPU: 0
+  isCPU: 1
   ball: {fileID: 2013635902}
   speed: 7
   followThreshold: 0.5
