@@ -3,6 +3,7 @@ using UnityEngine;
 public class BlockPlacer : MonoBehaviour
 {
     public GameObject blockPrefab; // 白色のPrefabのみ
+    public Vector3 blockScale = Vector3.one; // ← 追加
     public int rows = 5;
     public int columns = 10; // 片側の列数（全体はcolumns*2）
     public float spacing = 1.5f;
@@ -28,6 +29,9 @@ public class BlockPlacer : MonoBehaviour
             {
                 Vector3 position = new Vector3(j * spacing + initializePosx, -i * spacing + initializePosy, 0);
                 blocks[i, j] = Instantiate(blockPrefab, position, Quaternion.identity);
+
+                // ここでスケールを適用
+                blocks[i, j].transform.localScale = blockScale;
 
                 Block blockScript = blocks[i, j].GetComponent<Block>();
                 if (blockScript != null)
