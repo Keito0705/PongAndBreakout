@@ -271,7 +271,7 @@ MonoBehaviour:
   isCPU: 1
   ball: {fileID: 2013635902}
   speed: 7
-  followThreshold: 0.5
+  followThreshold: 0.8
   paddleSide: 1
   paddleCollider: {fileID: 202529426}
 --- !u!1 &249292884
@@ -285,6 +285,7 @@ GameObject:
   - component: {fileID: 249292887}
   - component: {fileID: 249292886}
   - component: {fileID: 249292885}
+  - component: {fileID: 249292888}
   m_Layer: 0
   m_Name: WallL
   m_TagString: Untagged
@@ -385,6 +386,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &249292888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 249292884}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e92af6516896aa4a8461779a0e72428, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wallType: 0
+  blockPlacer: {fileID: 1378192319}
 --- !u!1 &518275811
 GameObject:
   m_ObjectHideFlags: 0
@@ -1002,6 +1017,7 @@ GameObject:
   - component: {fileID: 1792136835}
   - component: {fileID: 1792136834}
   - component: {fileID: 1792136833}
+  - component: {fileID: 1792136836}
   m_Layer: 0
   m_Name: WallR
   m_TagString: Untagged
@@ -1102,6 +1118,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1792136836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1792136832}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e92af6516896aa4a8461779a0e72428, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wallType: 1
+  blockPlacer: {fileID: 1378192319}
 --- !u!1 &2013635898
 GameObject:
   m_ObjectHideFlags: 0
@@ -1240,7 +1270,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speedX: 500
-  speedY: 160
+  speedY: -160
   minSpeed: 2
 --- !u!61 &2013635904
 BoxCollider2D:
@@ -1417,6 +1447,6 @@ MonoBehaviour:
   isCPU: 1
   ball: {fileID: 518275816}
   speed: 7
-  followThreshold: 0.5
+  followThreshold: 0.8
   paddleSide: -1
   paddleCollider: {fileID: 2096615065}

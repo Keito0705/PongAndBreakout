@@ -54,21 +54,23 @@ public class BlockPlacer : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            ShiftRight();
-            UpdateBlocks();
-        }
+        //// キー操作は不要なら削除してOK
+        //if (Input.GetKeyDown(KeyCode.P))
+        //{
+        //    ShiftRight();
+        //    UpdateBlocks();
+        //}
+        //else if (Input.GetKeyDown(KeyCode.O))
+        //{
+        //    ShiftLeft();
+        //    UpdateBlocks();
+        //}
     }
 
-    public void SetBlockColorAndLayer(int row, int col, BlockColor color, string layerName)
-    {
-        colorArray[row, col] = color;
-        layerArray[row, col] = layerName;
-        SetBlockColorAndLayer(blocks[row, col], color, layerName);
-    }
+    // ボールや壁から呼び出す用
 
-    void ShiftRight()
+    //右にずらす
+    public void ShiftRight()
     {
         int totalCols = columns * 2;
         BlockColor[,] newColorArray = new BlockColor[rows, totalCols];
@@ -94,7 +96,34 @@ public class BlockPlacer : MonoBehaviour
         layerArray = newLayerArray;
     }
 
-    void UpdateBlocks()
+    //左にずらす
+    public void ShiftLeft()
+    {
+        int totalCols = columns * 2;
+        BlockColor[,] newColorArray = new BlockColor[rows, totalCols];
+        string[,] newLayerArray = new string[rows, totalCols];
+
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < totalCols; j++)
+            {
+                if (j == totalCols - 1)
+                {
+                    newColorArray[i, j] = BlockColor.White;
+                    newLayerArray[i, j] = "WhiteBlock";
+                }
+                else
+                {
+                    newColorArray[i, j] = colorArray[i, j + 1];
+                    newLayerArray[i, j] = layerArray[i, j + 1];
+                }
+            }
+        }
+        colorArray = newColorArray;
+        layerArray = newLayerArray;
+    }
+
+    public void UpdateBlocks()
     {
         int totalCols = columns * 2;
         for (int i = 0; i < rows; i++)
@@ -104,6 +133,13 @@ public class BlockPlacer : MonoBehaviour
                 SetBlockColorAndLayer(blocks[i, j], colorArray[i, j], layerArray[i, j]);
             }
         }
+    }
+
+    public void SetBlockColorAndLayer(int row, int col, BlockColor color, string layerName)
+    {
+        colorArray[row, col] = color;
+        layerArray[row, col] = layerName;
+        SetBlockColorAndLayer(blocks[row, col], color, layerName);
     }
 
     void SetBlockColorAndLayer(GameObject block, BlockColor color, string layerName)
