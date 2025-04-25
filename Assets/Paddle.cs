@@ -4,54 +4,67 @@ using UnityEngine;
 
 public class Paddle : MonoBehaviour
 {
-    public bool isCPU = false; // CPU操作かどうか
-    public Transform ball;     // Inspectorでボールを指定
-    public float speed = 1.0f;
-    public float followThreshold = 0.3f; // 追いかける反応の閾値
+    public bool isCPU = false;
+    public Transform ball;
+    public float speed = 8.0f;
+    public float followThreshold = 0.8f;
     public int paddleSide = 1; // 右側:1, 左側:-1
 
-    // パドル切り替え用
-    public GameObject rectPaddle;        // 長方形パドル (WhitePaddle/BlackPaddle)
-    public GameObject halfCirclePaddle;  // 半円パドル (WhiteHalfCircle/BlackHalfCircle)
-    private bool isHalfCircle = false;
-
     private Rigidbody2D myRigid;
-    private Collider2D paddleCollider;
+    public Collider2D paddleCollider;
     private Collider2D ballCollider;
     private bool ignoringCollision = false;
+
+    // 角度調整用
+    public float angleSpeed = 200f;
+    public float minAngle = -20f;
+    public float maxAngle = 20f;
+    private float currentAngle = 0f;
+    private bool isAngleAdjustMode = false;
+    private bool angleLockAtZero = false;
+
+    // タイミング打ち用
+    public float hitOffset = 0.5f;      // パドルがズレる距離
+    public float hitDuration = 0.08f;   // ズレている時間（秒）
+    public float hitPower = 8.0f;       // ボールに与える加速力
+    public float hitMoveTime = 0.06f;   // ズレる・戻るアニメーションの時間
+    private bool isHitting = false;
+    private Vector3 originalPosition;   // ゲーム開始時の初期位置
+    private Vector3 basePosition;       // ズレる直前の位置
 
     void Start()
     {
         myRigid = GetComponent<Rigidbody2D>();
-
-        // 最初は長方形パドルON、半円パドルOFF
-        if (rectPaddle != null) rectPaddle.SetActive(true);
-        if (halfCirclePaddle != null) halfCirclePaddle.SetActive(false);
-        isHalfCircle = false;
-
-        // コライダーを長方形から取得
-        if (rectPaddle != null)
-            paddleCollider = rectPaddle.GetComponent<Collider2D>();
+        if (paddleCollider == null)
+            paddleCollider = GetComponent<Collider2D>();
         if (ball != null)
             ballCollider = ball.GetComponent<Collider2D>();
+        currentAngle = 0f;
+        transform.rotation = Quaternion.Euler(0, 0, currentAngle);
+        originalPosition = transform.position;
     }
 
     void Update()
     {
-        // パドル形状切り替え
-        // 左パドル（paddleSide == -1）は右キー、右パドル（paddleSide == 1）はAキー
-        if ((paddleSide == -1 && Input.GetKeyDown(KeyCode.RightArrow)) ||
-            (paddleSide == 1 && Input.GetKeyDown(KeyCode.A)))
+        // 角度調整モード判定
+        if (paddleSide == 1)
         {
-            isHalfCircle = !isHalfCircle;
-            if (rectPaddle != null) rectPaddle.SetActive(!isHalfCircle);
-            if (halfCirclePaddle != null) halfCirclePaddle.SetActive(isHalfCircle);
+            isAngleAdjustMode = Input.GetKey(KeyCode.A);
+        }
+        else
+        {
+            isAngleAdjustMode = Input.GetKey(KeyCode.RightArrow);
+        }
 
-            // コライダーも切り替え
-            if (isHalfCircle && halfCirclePaddle != null)
-                paddleCollider = halfCirclePaddle.GetComponent<Collider2D>();
-            else if (rectPaddle != null)
-                paddleCollider = rectPaddle.GetComponent<Collider2D>();
+        // タイミング打ち入力
+        // 左パドル（paddleSide == -1）は左キー、右パドル（paddleSide == 1）はDキー
+        if (!isHitting)
+        {
+            if ((paddleSide == -1 && Input.GetKeyDown(KeyCode.LeftArrow)) ||
+                (paddleSide == 1 && Input.GetKeyDown(KeyCode.D)))
+            {
+                StartCoroutine(HitAction());
+            }
         }
     }
 
@@ -59,6 +72,7 @@ public class Paddle : MonoBehaviour
     {
         Vector2 force = Vector2.zero;
 
+        // CPU操作
         if (isCPU)
         {
             if (ball != null)
@@ -70,25 +84,96 @@ public class Paddle : MonoBehaviour
                 }
             }
         }
+        // プレイヤー操作
         else
         {
-            // 左パドル（paddleSide == -1）はW/Sキー、右パドル（paddleSide == 1）は↑↓キー
-            if (paddleSide == 1)
+            if (isAngleAdjustMode)
             {
-                if (Input.GetKey(KeyCode.W))
-                    force = new Vector2(0, speed);
-                if (Input.GetKey(KeyCode.S))
-                    force = new Vector2(0, -speed);
+                // 角度調整
+                float angleDelta = 0f;
+                bool keyPressed = false;
+
+                if (paddleSide == 1)
+                {
+                    if (Input.GetKey(KeyCode.W))
+                    {
+                        angleDelta = angleSpeed * Time.fixedDeltaTime;
+                        keyPressed = true;
+                    }
+                    if (Input.GetKey(KeyCode.S))
+                    {
+                        angleDelta = -angleSpeed * Time.fixedDeltaTime;
+                        keyPressed = true;
+                    }
+                }
+                else
+                {
+                    if (Input.GetKey(KeyCode.UpArrow))
+                    {
+                        angleDelta = -angleSpeed * Time.fixedDeltaTime;
+                        keyPressed = true;
+                    }
+                    if (Input.GetKey(KeyCode.DownArrow))
+                    {
+                        angleDelta = angleSpeed * Time.fixedDeltaTime;
+                        keyPressed = true;
+                    }
+                }
+
+                // 角度調整ロック判定
+                if (!angleLockAtZero)
+                {
+                    float nextAngle = Mathf.Clamp(currentAngle + angleDelta, minAngle, maxAngle);
+
+                    bool willCrossZero = (currentAngle > 0f && nextAngle <= 0f) || (currentAngle < 0f && nextAngle >= 0f);
+                    if (willCrossZero && Mathf.Abs(nextAngle) < 0.5f && keyPressed)
+                    {
+                        currentAngle = 0f;
+                        angleLockAtZero = true;
+                        transform.rotation = Quaternion.Euler(0, 0, currentAngle);
+                        return;
+                    }
+                    else if (keyPressed)
+                    {
+                        currentAngle = nextAngle;
+                        transform.rotation = Quaternion.Euler(0, 0, currentAngle);
+                    }
+                }
+
+                // ロック解除（キーを離したら）
+                bool keyReleased;
+                if (paddleSide == 1)
+                {
+                    keyReleased = !Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.S);
+                }
+                else
+                {
+                    keyReleased = !Input.GetKey(KeyCode.UpArrow) && !Input.GetKey(KeyCode.DownArrow);
+                }
+                if (angleLockAtZero && keyReleased)
+                {
+                    angleLockAtZero = false;
+                }
             }
             else
             {
-                if (Input.GetKey(KeyCode.UpArrow))
-                    force = new Vector2(0, speed);
-                if (Input.GetKey(KeyCode.DownArrow))
-                    force = new Vector2(0, -speed);
+                // 通常の上下移動
+                if (paddleSide == 1)
+                {
+                    if (Input.GetKey(KeyCode.W))
+                        force = new Vector2(0, speed);
+                    if (Input.GetKey(KeyCode.S))
+                        force = new Vector2(0, -speed);
+                }
+                else
+                {
+                    if (Input.GetKey(KeyCode.UpArrow))
+                        force = new Vector2(0, speed);
+                    if (Input.GetKey(KeyCode.DownArrow))
+                        force = new Vector2(0, -speed);
+                }
             }
         }
-        // 親オブジェクト（WhitePaddleParent/BlackPaddleParent）を動かす
         myRigid.MovePosition(myRigid.position + force * Time.fixedDeltaTime);
 
         // ボールが自ゴール側から来ているか判定
@@ -113,6 +198,61 @@ public class Paddle : MonoBehaviour
                     Physics2D.IgnoreCollision(paddleCollider, ballCollider, false);
                     ignoringCollision = false;
                 }
+            }
+        }
+    }
+
+    // 連続的にズレて戻るアニメーションを行うコルーチン
+    IEnumerator HitAction()
+    {
+        isHitting = true;
+
+        // ズレる直前の位置を保存（上下移動中でもOK）
+        basePosition = transform.position;
+
+        // ズレる方向を決定
+        // 左パドル（paddleSide == -1）は右方向、右パドル（paddleSide == 1）は左方向
+        Vector3 offset = (paddleSide == -1 ? -transform.right : transform.right) * hitOffset;
+
+        // スムーズにズレる
+        float t = 0f;
+        while (t < hitMoveTime)
+        {
+            float rate = t / hitMoveTime;
+            transform.position = Vector3.Lerp(basePosition, basePosition + offset, rate);
+            t += Time.deltaTime;
+            yield return null;
+        }
+        transform.position = basePosition + offset;
+
+        // ズレた位置でしばらく待機
+        yield return new WaitForSeconds(hitDuration);
+
+        // スムーズに元の位置へ戻る
+        t = 0f;
+        while (t < hitMoveTime)
+        {
+            float rate = t / hitMoveTime;
+            transform.position = Vector3.Lerp(basePosition + offset, basePosition, rate);
+            t += Time.deltaTime;
+            yield return null;
+        }
+        transform.position = basePosition;
+
+        isHitting = false;
+    }
+
+    // タイミング打ち中にボールと当たったら加速
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (isHitting && collision.gameObject.CompareTag("Ball"))
+        {
+            Rigidbody2D ballRb = collision.gameObject.GetComponent<Rigidbody2D>();
+            if (ballRb != null)
+            {
+                // 左パドルは右方向、右パドルは左方向
+                Vector2 hitDir = (paddleSide == -1 ? transform.right : -transform.right);
+                ballRb.velocity += hitDir.normalized * hitPower;
             }
         }
     }
