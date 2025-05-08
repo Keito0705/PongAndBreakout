@@ -150,7 +150,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 202529424}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -162,7 +162,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 5
+  m_Constraints: 4
 --- !u!61 &202529426
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -270,12 +270,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isCPU: 0
   ball: {fileID: 2013635902}
-  speed: 8
+  speedX: 3
+  speedY: 7
   followThreshold: 0.8
   paddleSide: 1
   paddleCollider: {fileID: 202529426}
-  angleSpeed: 200
-  minAngle: -20
   maxAngle: 20
 --- !u!1 &249292884
 GameObject:
@@ -450,12 +449,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isCPU: 0
   ball: {fileID: 2013635902}
-  speed: 7
+  speedX: 2
+  speedY: 8
   followThreshold: 0.8
   paddleSide: 1
   paddleCollider: {fileID: 0}
-  angleSpeed: 60
-  minAngle: -45
   maxAngle: 45
 --- !u!50 &414628423
 Rigidbody2D:
@@ -514,6 +512,7 @@ MonoBehaviour:
   speedX: 250
   speedY: 80
   minSpeed: 2
+  maxSpeed: 1000
 --- !u!50 &518275813
 Rigidbody2D:
   serializedVersion: 4
@@ -939,12 +938,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isCPU: 0
   ball: {fileID: 518275816}
-  speed: 7
+  speedX: 2
+  speedY: 8
   followThreshold: 0.8
   paddleSide: -1
   paddleCollider: {fileID: 0}
-  angleSpeed: 60
-  minAngle: -45
   maxAngle: 45
 --- !u!4 &985677835
 Transform:
@@ -1494,6 +1492,7 @@ MonoBehaviour:
   speedX: 250
   speedY: -80
   minSpeed: 2
+  maxSpeed: 16
 --- !u!61 &2013635904
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1548,7 +1547,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2096615062}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -1560,7 +1559,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 5
+  m_Constraints: 4
 --- !u!61 &2096615065
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1668,10 +1667,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isCPU: 1
   ball: {fileID: 518275816}
-  speed: 8
+  speedX: 2
+  speedY: 8
   followThreshold: 0.8
   paddleSide: -1
   paddleCollider: {fileID: 2096615065}
-  angleSpeed: 200
-  minAngle: -20
   maxAngle: 20

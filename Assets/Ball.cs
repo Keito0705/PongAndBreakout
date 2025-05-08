@@ -9,8 +9,10 @@ public class Ball : MonoBehaviour
     public float speedX = 10;
     public float speedY = 10;
 
-    // 最大速度
+    // 最小速度
     public float minSpeed = 75;
+    // 最大速度
+    public float maxSpeed = 1000;
 
     // Start is called before the first frame update
     void Start()
@@ -28,7 +30,7 @@ public class Ball : MonoBehaviour
         // 現在の速度を取得
         Vector2 velocity = myRigid.velocity;
 
-
+        ////低速度チェック
         //X方向の速度をチェック(＋方向)
         if (0 <= velocity.x && velocity.x < minSpeed)
         {
@@ -39,7 +41,6 @@ public class Ball : MonoBehaviour
         {
             myRigid.velocity = new Vector2(-minSpeed, velocity.y);
         }
-
         //Y方向の速度をチェック(＋方向)
         if (0 <= velocity.y && velocity.y < minSpeed)
         {
@@ -49,6 +50,31 @@ public class Ball : MonoBehaviour
         if (0 >= velocity.y && velocity.y > -minSpeed)
         {
             myRigid.velocity = new Vector2(velocity.x, -minSpeed);
+        }
+
+
+
+        ////高速度チェック
+        //X方向の速度をチェック(＋方向)
+        if (maxSpeed <= velocity.x)
+        {
+            myRigid.velocity = new Vector2(maxSpeed, velocity.y);
+        }
+        //X方向の速度をチェック(－方向)
+        if (-maxSpeed >= velocity.x)
+        {
+            myRigid.velocity = new Vector2(-maxSpeed, velocity.y);
+        }
+
+        //Y方向の速度をチェック(＋方向)
+        if (maxSpeed <= velocity.y)
+        {
+            myRigid.velocity = new Vector2(velocity.x, maxSpeed);
+        }
+        //Y方向の速度をチェック(－方向)
+        if (-maxSpeed >= velocity.y)
+        {
+            myRigid.velocity = new Vector2(velocity.x, -maxSpeed);
         }
     }
 }
