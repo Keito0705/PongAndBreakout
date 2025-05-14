@@ -6,6 +6,16 @@ using UnityEngine.SceneManagement;
 
 public class scenechange : MonoBehaviour
 {
+
+    void Update()
+    {
+        // スペースキーが押されたらFromToPlay()を呼び出す
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            FromToPlay();
+        }
+    }
+
     public void FromToPlay()
     {
         SceneManager.LoadScene("game");
@@ -15,5 +25,4 @@ public class scenechange : MonoBehaviour
     {
         SceneManager.LoadScene("title");
     }
-
 }
