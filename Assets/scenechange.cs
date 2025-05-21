@@ -4,7 +4,7 @@ using System.Xml.Serialization;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class scenechange : MonoBehaviour
+public class Scenechange : MonoBehaviour
 {
 
     void Update()
@@ -24,5 +24,10 @@ public class scenechange : MonoBehaviour
     public void FromToTitle()
     {
         SceneManager.LoadScene("title");
+    }
+
+    public void FromToResult()
+    {
+        SceneManager.LoadScene("result");
     }
 }
