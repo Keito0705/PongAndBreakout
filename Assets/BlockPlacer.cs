@@ -14,7 +14,7 @@ public class BlockPlacer : MonoBehaviour
     private BlockColor[,] colorArray;
     private string[,] layerArray;
 
-    public enum BlockColor { Black, White }
+    public enum BlockColor { Black, White , Red}
 
     void Start()
     {
@@ -58,17 +58,17 @@ public class BlockPlacer : MonoBehaviour
 
     void Update()
     {
-        //// キー操作は不要なら削除してOK
-        //if (Input.GetKeyDown(KeyCode.P))
-        //{
-        //    ShiftRight();
-        //    UpdateBlocks();
-        //}
-        //else if (Input.GetKeyDown(KeyCode.O))
-        //{
-        //    ShiftLeft();
-        //    UpdateBlocks();
-        //}
+        // キー操作は不要なら削除してOK
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            ShiftRight();
+            UpdateBlocks();
+        }
+        else if (Input.GetKeyDown(KeyCode.O))
+        {
+            ShiftLeft();
+            UpdateBlocks();
+        }
     }
 
     // ボールや壁から呼び出す用
@@ -98,6 +98,17 @@ public class BlockPlacer : MonoBehaviour
         }
         colorArray = newColorArray;
         layerArray = newLayerArray;
+
+        // 位置再配置
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < totalCols; j++)
+            {
+                Vector3 newPos = new Vector3(j * spacing + initializePosx, -i * spacing + initializePosy, 0);
+                blocks[i, j].transform.position = newPos;
+            }
+        }
+        UpdateBlocks();
     }
 
     //左にずらす
@@ -125,6 +136,17 @@ public class BlockPlacer : MonoBehaviour
         }
         colorArray = newColorArray;
         layerArray = newLayerArray;
+
+        // 位置再配置
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < totalCols; j++)
+            {
+                Vector3 newPos = new Vector3(j * spacing + initializePosx, -i * spacing + initializePosy, 0);
+                blocks[i, j].transform.position = newPos;
+            }
+        }
+        UpdateBlocks();
     }
 
     public void UpdateBlocks()
@@ -159,4 +181,39 @@ public class BlockPlacer : MonoBehaviour
             block.layer = layer;
         }
     }
+
+
+
+    //大爆発関数
+
+    public void ExplodeAround(int centerRow, int centerCol, int radius, BlockColor fromColor)
+    {
+        int totalCols = columns * 2;
+        BlockColor toColor = (fromColor == BlockColor.Black) ? BlockColor.White : BlockColor.Black;
+        string toLayer = (toColor == BlockColor.Black) ? "BlackBlock" : "WhiteBlock";
+
+        for (int i = centerRow - radius; i <= centerRow + radius; i++)
+        {
+            for (int j = centerCol - radius; j <= centerCol + radius; j++)
+            {
+                // 範囲外はスキップ
+                if (i < 0 || j < 0 || i >= rows || j >= totalCols) continue;
+
+                // 四隅判定
+                bool isCorner =
+                    (i == centerRow - radius && j == centerCol - radius) ||
+                    (i == centerRow - radius && j == centerCol + radius) ||
+                    (i == centerRow + radius && j == centerCol - radius) ||
+                    (i == centerRow + radius && j == centerCol + radius);
+
+                if (isCorner) continue; // 四隅はスキップ
+
+                SetBlockColorAndLayer(i, j, toColor, toLayer);
+            }
+        }
+        UpdateBlocks();
+    }
+
+
 }
+

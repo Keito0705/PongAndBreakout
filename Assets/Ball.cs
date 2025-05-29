@@ -18,7 +18,7 @@ public class Ball : MonoBehaviour
     public float maxSpeed = 16;
 
     private float temperature = 0;
-    private float addTemperature = 5;
+    private float addTemperature = 10;
     private float MaxTemperature = 100;
 
     // Start is called before the first frame update
@@ -104,22 +104,40 @@ public class Ball : MonoBehaviour
         //ブロックに当たった時、温度を上昇させる
         if (collision.gameObject.CompareTag("Block"))
         {
+            Block block = collision.gameObject.GetComponent<Block>(); // ここを追加
+
             //左プレイヤー用
             if (this.gameObject.name == "WhiteBall")
             {
                 temperature += addTemperature;
                 if (temperature > MaxTemperature) { temperature = MaxTemperature; }
+               
+                
+                if(temperature >= 100)
+                {
+                    // ブロックに温度を渡す
+                    block.ReflectionTemperature1(temperature);
+
+                    temperature = 0;
+                }
                 GaugeManager.Instance.ReflectionTemperature1(temperature);
-                Block.Instance.ReflectionTemperature1(temperature);
+
             }
             //右プレイヤー用
             if (this.gameObject.name == "BlackBall")
             {
                 temperature += addTemperature;
-                //
                 if (temperature > MaxTemperature) { temperature = MaxTemperature; }
+              
+
+                if (temperature >= 100)
+                {
+                    // ブロックに温度を渡す
+                    block.ReflectionTemperature2(temperature);
+
+                    temperature = 0;
+                }
                 GaugeManager.Instance.ReflectionTemperature2(temperature);
-                Block.Instance.ReflectionTemperature2(temperature);
             }
         }
 
@@ -128,15 +146,17 @@ public class Ball : MonoBehaviour
         {
             temperature = 0.0f;
             GaugeManager.Instance.ReflectionTemperature1(temperature);
-            Block.Instance.ReflectionTemperature1(temperature);
+            //Block.Instance.ReflectionTemperature1(temperature);
         }
+
         //壁に当たった時、温度を０にする(左用)
-        if (collision.gameObject.name == "WallR" && this.gameObject.name == "BlockBall")
+        if (collision.gameObject.name == "WallR" && this.gameObject.name == "BlackBall")
         {
             temperature = 0.0f;
             GaugeManager.Instance.ReflectionTemperature2(temperature);
-            Block.Instance.ReflectionTemperature2(temperature);
+            //Block.Instance.ReflectionTemperature2(temperature);
         }
+
 
     }
 }

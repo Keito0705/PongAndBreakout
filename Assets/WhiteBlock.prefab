@@ -127,3 +127,6 @@ MonoBehaviour:
   row: 0
   col: 0
   placer: {fileID: 0}
+  redOutlinePrefab: {fileID: 5247911338195382729, guid: 52e8270ce143b6241bce0e7a14e53357, type: 3}
+  temperature1: 0
+  temperature2: 0

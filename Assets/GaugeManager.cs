@@ -25,7 +25,7 @@ public class GaugeManager : MonoBehaviour
     public Slider gauge2;
 
     [Header("ゲージ最大値")]
-    public float maxGauge = 100f;
+    public float maxGauge = 90f;
 
     [Header("現在のゲージ値")]
     public float gaugeValue1 = 0f;
